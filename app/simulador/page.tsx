@@ -1,4 +1,4 @@
-export default function SimulatorPage() {
+export default function PaginaSimulador() {
   return (
     <main>
       <h1>Simulador de pagos</h1>

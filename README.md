@@ -26,11 +26,11 @@ Ejecútalos desde la raíz del repositorio. Funcionan igual en PowerShell, Git B
 | Instalar dependencias | `npm install` | Termina sin errores y crea `node_modules/` y `package-lock.json` |
 | Desarrollar | `npm run dev` | Sirve en http://localhost:3000 con recarga en caliente. Se detiene con `Ctrl+C` |
 | Comprobar tipos | `npm run typecheck` | Sin salida de error y código de salida 0 |
-| Compilar | `npm run build` | Termina bien y lista las rutas `/`, `/dashboard`, `/evidence` y `/simulator` |
+| Compilar | `npm run build` | Termina bien y lista las rutas `/`, `/panel`, `/evidencias` y `/simulador` |
 | Probar la versión compilada | `npm run start -- -p 3055` | Sirve en http://localhost:3055 (requiere `npm run build` antes) |
 | Cambiar el puerto en desarrollo | `npm run dev -- -p 3055` | Sirve en http://localhost:3055 |
 
-Comprobación rápida de que una página responde (PowerShell): `curl.exe -s -o NUL -w "%{http_code}" http://localhost:3055/dashboard` → `200`. En Git Bash o Linux: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3055/dashboard`.
+Comprobación rápida de que una página responde (PowerShell): `curl.exe -s -o NUL -w "%{http_code}" http://localhost:3055/panel` → `200`. En Git Bash o Linux: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3055/panel`.
 
 No existen scripts de `lint`, `test` ni `e2e`. No los inventes ni los agregues sin acordarlo con Dev 2.
 
@@ -43,38 +43,38 @@ npm run typecheck
 npm run build
 ```
 
-Una tarea no está terminada solo porque el código "debería funcionar": debe existir evidencia verificable ([definition-of-done.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/definition-of-done.md)).
+Una tarea no está terminada solo porque el código "debería funcionar": debe existir evidencia verificable ([definicion-de-terminado.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/definicion-de-terminado.md)).
 
 ### 4. Mapa de archivos
 
 | Ruta | Qué es | Estado |
 |---|---|---|
 | `app/layout.tsx` | Layout raíz (`<html lang="es">`) | Existe |
-| `app/page.tsx` | Inicio con enlaces a las tres secciones | Placeholder |
-| `app/dashboard/page.tsx` | Panel de control | Placeholder, sin datos |
-| `app/simulator/page.tsx` | Simulador de pagos | Placeholder, sin datos |
-| `app/evidence/page.tsx` | Centro de evidencias | Placeholder, sin datos |
-| `app/api/v1/executions/`, `rules/`, `health/` | Route Handlers de la API | Carpetas vacías (`.gitkeep`). **No existe ningún endpoint todavía** |
-| `next.config.ts`, `tsconfig.json`, `package.json` | Configuración | Mínima |
+| `app/pagina.tsx` | Inicio con enlaces a las tres secciones | Placeholder |
+| `app/panel/pagina.tsx` | Panel de control | Placeholder, sin datos |
+| `app/simulador/pagina.tsx` | Simulador de pagos | Placeholder, sin datos |
+| `app/evidencias/pagina.tsx` | Centro de evidencias | Placeholder, sin datos |
+| `app/api/v1/ejecuciones/`, `reglas/`, `salud/` | Route Handlers de la API | Carpetas vacías (`.gitkeep`). **No existe ningún endpoint todavía** |
+| `next.configuracion.ts`, `tsconfig.json`, `package.json` | Configuración | Mínima |
 
 ### 5. Qué hacer ahora (Dev 2, Bloque 1 del plan)
 
-Orden y detalle en [developers/developer-2/work-plan.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/developers/developer-2/work-plan.md):
+Orden y detalle en [desarrolladores/desarrollador-2/plan-trabajo.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/desarrolladores/desarrollador-2/plan-trabajo.md):
 
 1. **Día 1, base de la app:** el esqueleto ya está. Falta acordar la navegación y el layout definitivos.
-2. **Día 2, simulador con mocks:** construir el formulario de solicitud de pago según el contrato de pago de [api-contracts.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/api-contracts.md#3-post-apiv1executions), consumiendo fixtures.
-3. **Día 3, dashboard con mocks:** panel de ejecuciones con `mocks/payment-approved.json`, `mocks/payment-blocked.json` y `mocks/investigation-failed.json`.
-4. **Día 4 en adelante:** conectar al backend real cuando Dev 1 publique `POST /api/v1/executions`.
+2. **Día 2, simulador con mocks:** construir el formulario de solicitud de pago según el contrato de pago de [contratos-api.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/contratos-api.md#3-post-apiv1ejecuciones), consumiendo fixtures.
+3. **Día 3, panel con mocks:** panel de ejecuciones con `mocks/pago-aprobado.json`, `mocks/pago-bloqueado.json` y `mocks/investigacion-fallida.json`.
+4. **Día 4 en adelante:** conectar al backend real cuando Dev 1 publique `POST /api/v1/ejecuciones`.
 
 **Bloqueo conocido:** las fixtures las publica Dev 5 en `flowguard-mocks` y **todavía no existen**. Mientras no existan, no inventes datos de ejemplo: deja el estado vacío y avisa a Dev 5.
 
 ### 6. Reglas obligatorias
 
-- **No inventes** endpoints, campos, estados, códigos de error ni formatos de respuesta. La fuente de verdad es [api-contracts.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/api-contracts.md) y [error-catalog.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/error-catalog.md). Si falta algo, déjalo como pendiente y avisa; no lo supongas.
+- **No inventes** endpoints, campos, estados, códigos de error ni formatos de respuesta. La fuente de verdad es [contratos-api.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/contratos-api.md) y [catalogo-errores.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/catalogo-errores.md). Si falta algo, déjalo como pendiente y avisa; no lo supongas.
 - **No muestres datos inventados** en la interfaz. Muestra solo lo que devuelve el backend o una fixture oficial, y distingue visualmente "conectado a mocks" de "conectado al backend real".
-- **El frontend no decide.** No reimplementes las reglas PAY-001 a PAY-005 y nunca autorices ni bloquees un pago desde la interfaz: la decisión (`ALLOW` o `BLOCK`) viene del backend.
-- **Nada de acceso directo a Supabase desde el navegador** ni claves privadas en código del cliente. Solo se leen datos a través de `/api/v1/*` ([security.md § 2.0](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/security.md#20-estrategia-de-seguridad-por-entorno)).
-- **Estados de interfaz:** representa carga, error, vacío y éxito, según [architecture.md § 6.4](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/architecture.md#64-estados-de-interfaz).
+- **El frontend no decide.** No reimplementes las reglas PAG-001 a PAG-005 y nunca autorices ni bloquees un pago desde la interfaz: la decisión (`PERMITIR` o `BLOQUEAR`) viene del backend.
+- **Nada de acceso directo a Supabase desde el navegador** ni claves privadas en código del cliente. Solo se leen datos a través de `/api/v1/*` ([seguridad.md § 2.0](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/seguridad.md#20-estrategia-de-seguridad-por-entorno)).
+- **Estados de interfaz:** representa carga, error, vacío y éxito, según [arquitectura.md § 6.4](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/arquitectura.md#64-estados-de-interfaz).
 - **No agregues** dependencias, frameworks, librerías de estilos, lint o pruebas sin acordarlo con Dev 2 y el equipo.
 - **No modifiques** contratos, `flowguard-src`, SQL ni documentación técnica de otros puestos desde este repositorio.
 - **Secretos:** nunca subas `.env` ni claves. `.gitignore` ya excluye `.env*`, `node_modules/`, `.next/` y `next-env.d.ts`.
@@ -88,21 +88,21 @@ Orden y detalle en [developers/developer-2/work-plan.md](https://github.com/Flow
 
 ## Alcance
 
-Según [flowguard-docs/architecture.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/architecture.md#3-estructura-del-repositorio), este repo corresponde a la carpeta `app/` de la estructura completa:
+Según [flowguard-docs/arquitectura.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/arquitectura.md#3-estructura-del-repositorio), este repo corresponde a la carpeta `app/` de la estructura completa:
 
 ```
 app/
-├── dashboard/
-├── simulator/
-├── evidence/
+├── panel/
+├── simulador/
+├── evidencias/
 └── api/
     └── v1/
-        ├── executions/
-        ├── rules/
-        └── health/
+        ├── ejecuciones/
+        ├── reglas/
+        └── salud/
 ```
 
-Los Route Handlers de `app/api/v1/` implementan los contratos definidos en [flowguard-docs/api-contracts.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/api-contracts.md) — ese documento es la fuente de verdad del contrato, no este README.
+Los Route Handlers de `app/api/v1/` implementan los contratos definidos en [flowguard-docs/contratos-api.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/contratos-api.md) — ese documento es la fuente de verdad del contrato, no este README.
 
 ## Dependencias de otros repos
 
@@ -112,10 +112,10 @@ Los Route Handlers de `app/api/v1/` implementan los contratos definidos en [flow
 
 ## Estado actual
 
-Esqueleto inicial de un proyecto Next.js (App Router) con React y TypeScript, **sin datos ni lógica**, listo para que Dev 2 empiece a trabajar siguiendo el Bloque 1 de [flowguard-docs/implementation-checklist.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/implementation-checklist.md).
+Esqueleto inicial de un proyecto Next.js (App Router) con React y TypeScript, **sin datos ni lógica**, listo para que Dev 2 empiece a trabajar siguiendo el Bloque 1 de [flowguard-docs/checklist-implementacion.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/checklist-implementacion.md).
 
-Verificado al crear el esqueleto con Node 20.20: `npm run typecheck` y `npm run build` pasan, y las páginas `/`, `/dashboard`, `/simulator` y `/evidence` responden 200. `/api/v1/health` responde 404 porque el endpoint aún no existe.
+Verificado al crear el esqueleto con Node 20.20: `npm run typecheck` y `npm run build` pasan, y las páginas `/`, `/panel`, `/simulador` y `/evidencias` responden 200. `/api/v1/salud` responde 404 porque el endpoint aún no existe.
 
 ### Decisión pendiente (Dev 1 y Dev 2)
 
-[flowguard-docs/architecture.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/architecture.md#3-estructura-del-repositorio) describe un repo final `flowguard` con `app/` y `src/` en la raíz, integrados con `git subtree --prefix=app`. Este repo, igual que `flowguard-src`, trae su propio `package.json` en la raíz y la carpeta `app/` dentro, por lo que un `subtree` tal cual los anidaría (`app/app/...`). Cómo consume la app los contratos de `flowguard-src` y cómo se integran ambos en `flowguard` debe decidirse antes de la primera integración (recomendada no antes del día 6).
+[flowguard-docs/arquitectura.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/arquitectura.md#3-estructura-del-repositorio) describe un repo final `flowguard` con `app/` y `src/` en la raíz, integrados con `git subtree --prefix=app`. Este repo, igual que `flowguard-src`, trae su propio `package.json` en la raíz y la carpeta `app/` dentro, por lo que un `subtree` tal cual los anidaría (`app/app/...`). Cómo consume la app los contratos de `flowguard-src` y cómo se integran ambos en `flowguard` debe decidirse antes de la primera integración (recomendada no antes del día 6).

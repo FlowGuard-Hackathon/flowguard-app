@@ -6,7 +6,8 @@ export const metadata: Metadata = {
   description: "Supervisión de aprobaciones de pago con evidencia verificable.",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+// metadata y children los exige Next.js con esos nombres
+export default function LayoutRaiz({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <body>{children}</body>
