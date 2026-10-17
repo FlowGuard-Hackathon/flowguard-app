@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function HomePage() {
+export default function PaginaInicio() {
   return (
     <main>
       <h1>FlowGuard</h1>
@@ -8,13 +8,13 @@ export default function HomePage() {
       <nav>
         <ul>
           <li>
-            <Link href="/dashboard">Panel de control</Link>
+            <Link href="/panel">Panel de control</Link>
           </li>
           <li>
-            <Link href="/simulator">Simulador de pagos</Link>
+            <Link href="/simulador">Simulador de pagos</Link>
           </li>
           <li>
-            <Link href="/evidence">Centro de evidencias</Link>
+            <Link href="/evidencias">Centro de evidencias</Link>
           </li>
         </ul>
       </nav>

@@ -1,4 +1,4 @@
-export default function EvidencePage() {
+export default function PaginaEvidencias() {
   return (
     <main>
       <h1>Centro de evidencias</h1>

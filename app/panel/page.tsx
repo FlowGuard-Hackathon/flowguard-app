@@ -1,4 +1,4 @@
-export default function DashboardPage() {
+export default function PaginaPanel() {
   return (
     <main>
       <h1>Panel de control</h1>
