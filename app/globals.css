@@ -1,38 +1,60 @@
-/* Reset y estructura mínima. Sin paleta de colores, sin tipografía de marca,
-   sin componentes visuales: eso lo define Dev 2. Esto solo resuelve el
-   layout (header fijo arriba, contenido debajo, nav en fila) para que las
-   páginas no se vean como HTML sin estilo mientras no haya diseño. */
-
-*, *::before, *::after {
-  box-sizing: border-box;
+:root {
+  --fondo: #f7f8fa;
+  --superficie: #ffffff;
+  --texto: #1b1f24;
+  --texto-suave: #5b6570;
+  --borde: #dde1e6;
+  --acento: #1f5fd1;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #14171a;
+    --superficie: #1c2025;
+    --texto: #e8eaed;
+    --texto-suave: #9aa4af;
+    --borde: #2d333a;
+    --acento: #6ea0ff;
+  }
+}
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-.encabezado-sitio {
+.encabezado {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid currentColor;
+  gap: 2rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
 }
 
-.nav-principal ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.marca {
+  font-weight: 700;
+  color: var(--texto);
+  text-decoration: none;
 }
 
-.contenido-principal {
+.navegacion { display: flex; gap: 0.25rem; }
+
+.enlace {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  color: var(--texto-suave);
+  text-decoration: none;
+}
+.enlace:hover { color: var(--texto); }
+.enlace.activo { color: var(--acento); background: color-mix(in srgb, var(--acento) 12%, transparent); }
+
+.contenido {
+  max-width: 1100px;
+  margin: 0 auto;
   padding: 1.5rem;
-  max-width: 960px;
-  margin-inline: auto;
 }

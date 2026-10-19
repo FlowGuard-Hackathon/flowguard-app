@@ -1,39 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import Navegacion from "./componentes/Navegacion";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FlowGuard",
-  description: "Supervisión de aprobaciones de pago con evidencia verificable.",
+  description: "Supervisión de aprobación de pagos simulados",
 };
 
-// Navegación compartida: layout (estructura), no diseño. Colores, tipografía
-// y estilo visual quedan pendientes de Dev 2.
-const ENLACES_NAV = [
-  { href: "/panel", texto: "Panel de control" },
-  { href: "/simulador", texto: "Simulador de pagos" },
-  { href: "/evidencias", texto: "Centro de evidencias" },
-];
-
-// metadata y children los exige Next.js con esos nombres
 export default function LayoutRaiz({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <body>
-        <header className="encabezado-sitio">
-          <Link href="/">FlowGuard</Link>
-          <nav className="nav-principal" aria-label="Navegación principal">
-            <ul>
-              {ENLACES_NAV.map((enlace) => (
-                <li key={enlace.href}>
-                  <Link href={enlace.href}>{enlace.texto}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+        <header className="encabezado">
+          <a href="/" className="marca">FlowGuard</a>
+          <Navegacion />
         </header>
-        <main className="contenido-principal">{children}</main>
+        <main className="contenido">{children}</main>
       </body>
     </html>
   );
