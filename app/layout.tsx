@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import Navegacion from "./componentes/Navegacion";
 import "./globals.css";

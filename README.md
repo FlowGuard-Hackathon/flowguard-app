@@ -49,19 +49,20 @@ Una tarea no está terminada solo porque el código "debería funcionar": debe e
 
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `app/layout.tsx` | Layout raíz (`<html lang="es">`) | Existe |
-| `app/pagina.tsx` | Inicio con enlaces a las tres secciones | Placeholder |
-| `app/panel/pagina.tsx` | Panel de control | Placeholder, sin datos |
-| `app/simulador/pagina.tsx` | Simulador de pagos | Placeholder, sin datos |
-| `app/evidencias/pagina.tsx` | Centro de evidencias | Placeholder, sin datos |
+| `app/layout.tsx` | Layout raíz (`<html lang="es">`) + header con navegación compartida (`/`, `/panel`, `/simulador`, `/evidencias`) | Estructura lista. **Sin diseño visual** (colores, tipografía, marca) — eso lo define Dev 2 |
+| `app/globals.css` | Reset mínimo + clases estructurales (`encabezado-sitio`, `nav-principal`, `contenido-principal`) | Solo layout (posiciones/espaciado), cero paleta de colores. Dev 2 la reemplaza o la extiende con el diseño real |
+| `app/page.tsx` | Inicio | Placeholder, sin datos |
+| `app/panel/page.tsx` | Panel de control | Placeholder, sin datos |
+| `app/simulador/page.tsx` | Simulador de pagos | Placeholder, sin datos |
+| `app/evidencias/page.tsx` | Centro de evidencias | Placeholder, sin datos |
 | `app/api/v1/ejecuciones/`, `reglas/`, `salud/` | Route Handlers de la API | Carpetas vacías (`.gitkeep`). **No existe ningún endpoint todavía** |
-| `next.configuracion.ts`, `tsconfig.json`, `package.json` | Configuración | Mínima |
+| `next.config.ts`, `tsconfig.json`, `package.json` | Configuración | Mínima |
 
 ### 5. Qué hacer ahora (Dev 2, Bloque 1 del plan)
 
 Orden y detalle en [desarrolladores/desarrollador-2/plan-trabajo.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/desarrolladores/desarrollador-2/plan-trabajo.md):
 
-1. **Día 1, base de la app:** el esqueleto ya está. Falta acordar la navegación y el layout definitivos.
+1. **Día 1, base de la app:** la estructura de layout ya está (header con nav compartida en `app/layout.tsx`, una sola región `<main>` por página). Falta el diseño visual definitivo (colores, tipografía, componentes) — `app/globals.css` hoy es solo reset + estructura, a propósito, para no invadir decisiones de Dev 2.
 2. **Día 2, simulador con mocks:** construir el formulario de solicitud de pago según el contrato de pago de [contratos-api.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/contratos-api.md#3-post-apiv1ejecuciones), consumiendo fixtures.
 3. **Día 3, panel con mocks:** panel de ejecuciones con `mocks/pago-aprobado.json`, `mocks/pago-bloqueado.json` y `mocks/investigacion-fallida.json`.
 4. **Día 4 en adelante:** conectar al backend real cuando Dev 1 publique `POST /api/v1/ejecuciones`.
