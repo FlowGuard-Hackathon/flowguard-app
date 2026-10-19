@@ -4,12 +4,13 @@
   "private": true,
   "description": "Frontend de FlowGuard: panel de control, simulador de pagos, centro de evidencias y Route Handlers de la API.",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "flowguard-src": "file:../flowguard-src",
     "next": "^16.4.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

@@ -23,16 +23,18 @@ Ejecútalos desde la raíz del repositorio. Funcionan igual en PowerShell, Git B
 
 | Para... | Comando | Resultado esperado |
 |---|---|---|
-| Instalar dependencias | `npm install` | Termina sin errores y crea `node_modules/` y `package-lock.json` |
+| Instalar dependencias | `npm install` | Termina sin errores y crea `node_modules/` y `package-lock.json`. **Requiere** que `../flowguard-src` exista como carpeta hermana y tenga su `dist/` compilado (`npm run build` allá) — ver § "Dependencia local: flowguard-src" |
 | Desarrollar | `npm run dev` | Sirve en http://localhost:3000 con recarga en caliente. Se detiene con `Ctrl+C` |
 | Comprobar tipos | `npm run typecheck` | Sin salida de error y código de salida 0 |
-| Compilar | `npm run build` | Termina bien y lista las rutas `/`, `/panel`, `/evidencias` y `/simulador` |
+| Compilar | `npm run build` | Termina bien y lista las rutas `/`, `/panel`, `/evidencias`, `/simulador` y `/probar-backend` |
 | Probar la versión compilada | `npm run start -- -p 3055` | Sirve en http://localhost:3055 (requiere `npm run build` antes) |
 | Cambiar el puerto en desarrollo | `npm run dev -- -p 3055` | Sirve en http://localhost:3055 |
 
 Comprobación rápida de que una página responde (PowerShell): `curl.exe -s -o NUL -w "%{http_code}" http://localhost:3055/panel` → `200`. En Git Bash o Linux: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3055/panel`.
 
 No existen scripts de `lint`, `test` ni `e2e`. No los inventes ni los agregues sin acordarlo con Dev 2.
+
+**Nota sobre Turbopack en Windows:** `dev` y `build` fuerzan `--webpack`. Turbopack (el bundler por defecto de Next 16) no resuelve el *junction* que crea `npm install` en Windows para dependencias locales (`file:../flowguard-src`): falla con `Module not found` aunque el paquete exista y esté bien formado. `--webpack` no tiene ese problema. Cuando `flowguard-src` y `flowguard-app` se integren en el repo combinado `flowguard` (sin dependencia `file:` cruzando carpetas), probablemente ya no haga falta — hay que volver a probar sin `--webpack` en ese momento.
 
 ### 3. Antes de dar una tarea por terminada
 
@@ -49,14 +51,17 @@ Una tarea no está terminada solo porque el código "debería funcionar": debe e
 
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `app/layout.tsx` | Layout raíz (`<html lang="es">`) + header con navegación compartida (`/`, `/panel`, `/simulador`, `/evidencias`) | Estructura lista. **Sin diseño visual** (colores, tipografía, marca) — eso lo define Dev 2 |
-| `app/globals.css` | Reset mínimo + clases estructurales (`encabezado-sitio`, `nav-principal`, `contenido-principal`) | Solo layout (posiciones/espaciado), cero paleta de colores. Dev 2 la reemplaza o la extiende con el diseño real |
-| `app/page.tsx` | Inicio | Placeholder, sin datos |
+| `app/layout.tsx` | Layout raíz (`<html lang="es">`) + header | Diseño real de Dev 2 (colores, tema claro/oscuro vía `prefers-color-scheme`) |
+| `app/componentes/Navegacion.tsx` | Nav con enlace activo resaltado (`usePathname()`) | De Dev 2 |
+| `app/globals.css` | Variables de color, tipografía, estructura | De Dev 2 |
+| `app/page.tsx` | Inicio | Placeholder + enlace a `/probar-backend` (herramienta de desarrollo) |
 | `app/panel/page.tsx` | Panel de control | Placeholder, sin datos |
 | `app/simulador/page.tsx` | Simulador de pagos | Placeholder, sin datos |
 | `app/evidencias/page.tsx` | Centro de evidencias | Placeholder, sin datos |
-| `app/api/v1/ejecuciones/`, `reglas/`, `salud/` | Route Handlers de la API | Carpetas vacías (`.gitkeep`). **No existe ningún endpoint todavía** |
-| `next.config.ts`, `tsconfig.json`, `package.json` | Configuración | Mínima |
+| `app/probar-backend/page.tsx` | Formulario de desarrollo que llama al backend real | **No es parte del producto.** A propósito sin diseño. Se borra cuando `/simulador` se conecte con el contrato final |
+| `app/api/v1/ejecuciones/route.ts` | Ruta de PRUEBA que llama a `flowguard-src` (motor + agente) | **No es el contrato final** de [contratos-api.md § 3](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/contratos-api.md#3-post-apiv1ejecuciones) — acepta el contexto confiable directo en el body porque no hay Supabase real todavía. Estado en memoria del proceso, se pierde al reiniciar |
+| `app/api/v1/reglas/`, `salud/` | Route Handlers de la API | Carpetas vacías (`.gitkeep`). **No existen todavía** |
+| `next.config.ts`, `tsconfig.json`, `package.json` | Configuración | `package.json` agrega `flowguard-src` como dependencia local (`file:../flowguard-src`) |
 
 ### 5. Qué hacer ahora (Dev 2, Bloque 1 del plan)
 
@@ -105,9 +110,19 @@ app/
 
 Los Route Handlers de `app/api/v1/` implementan los contratos definidos en [flowguard-docs/contratos-api.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/contratos-api.md) — ese documento es la fuente de verdad del contrato, no este README.
 
+## Dependencia local: flowguard-src
+
+Desde que existe `app/probar-backend/`, este repo depende de `flowguard-src` como paquete local: `"flowguard-src": "file:../flowguard-src"` en `package.json`. Requisitos para que funcione:
+
+1. `flowguard-src` debe existir como carpeta **hermana** de `flowguard-app` (mismo padre), clonada con ese nombre exacto.
+2. `flowguard-src` debe estar compilada: `cd ../flowguard-src && npm install && npm run build` (genera `dist/`, que es lo que este repo importa — nunca el `.ts` fuente directo). Si cambias algo en `flowguard-src`, hay que repetir `npm run build` allá y luego `npm install` aquí para que el *junction* de `node_modules/flowguard-src` quede al día (normalmente ni siquiera hace falta reinstalar, el *junction* apunta siempre al mismo `dist/`; alcanza con recompilar allá).
+3. Ver la nota de la § 2 sobre por qué `dev`/`build` fuerzan `--webpack`.
+
+Esto es temporal y de desarrollo: la integración definitiva pasa por el repo combinado `flowguard` (ver su README, pendiente de decisión de Dev 1 y Dev 2 sobre cómo conviven `app/` y `src/` ahí). Mientras tanto, `app/api/v1/ejecuciones/route.ts` y `app/probar-backend/` existen solo para poder probar el backend real desde el navegador.
+
 ## Dependencias de otros repos
 
-- `flowguard-src`: tipos y contratos compartidos (Zod), motor de reglas, cliente del agente.
+- `flowguard-src`: motor de reglas, persistencia (en memoria todavía) y agente — consumido como dependencia local, ver arriba.
 - `flowguard-mocks`: fixtures para trabajar sin el backend real (las publica Dev 5).
 - `flowguard-docs`: especificación completa (arquitectura, contratos, seguridad, reglas).
 
@@ -115,7 +130,7 @@ Los Route Handlers de `app/api/v1/` implementan los contratos definidos en [flow
 
 Esqueleto inicial de un proyecto Next.js (App Router) con React y TypeScript, **sin datos ni lógica**, listo para que Dev 2 empiece a trabajar siguiendo el Bloque 1 de [flowguard-docs/checklist-implementacion.md](https://github.com/FlowGuard-Hackathon/flowguard-docs/blob/main/checklist-implementacion.md).
 
-Verificado al crear el esqueleto con Node 20.20: `npm run typecheck` y `npm run build` pasan, y las páginas `/`, `/panel`, `/simulador` y `/evidencias` responden 200. `/api/v1/salud` responde 404 porque el endpoint aún no existe.
+Verificado con Node 20.20: `npm run typecheck` y `npm run build` pasan, y las páginas `/`, `/panel`, `/simulador`, `/evidencias` y `/probar-backend` responden 200. `/api/v1/salud` responde 404 porque el endpoint aún no existe. `/api/v1/ejecuciones` (`POST`) sí responde — ver § "Dependencia local: flowguard-src" — probado con `curl` contra un pago de $15,000 (resultado `BLOQUEAR` + informe `PARCIAL` del agente) y uno de $8,500 (resultado `PERMITIR` + informe `COMPLETADA`).
 
 ### Decisión pendiente (Dev 1 y Dev 2)
 
