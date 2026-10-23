@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { almacen } from "../lib/almacenPrueba";
-import { claseChipDecision, claseChipInvestigacion, formatoFecha } from "../lib/formato";
+import { almacen } from "../../lib/almacenPrueba";
+import { claseChipDecision, claseChipInvestigacion, formatoFecha } from "../../lib/formato";
 
 // Ver nota en app/panel/page.tsx: fuerza render por solicitud.
 export const dynamic = "force-dynamic";

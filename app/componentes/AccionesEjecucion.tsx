@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { IconoMas } from "./Icono";
 
 export default function AccionesEjecucion({ id }: { id: string }) {
   const [abierto, setAbierto] = useState(false);
@@ -33,7 +34,7 @@ export default function AccionesEjecucion({ id }: { id: string }) {
         aria-expanded={abierto}
         onClick={() => setAbierto((valor) => !valor)}
       >
-        ···
+        <IconoMas tamano={16} />
       </button>
       {abierto && (
         <div className="menu-acciones-lista" role="menu" aria-label={`Acciones para ${id}`}>

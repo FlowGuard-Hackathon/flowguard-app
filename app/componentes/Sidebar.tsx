@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconoCarpeta, IconoDocumento, IconoEscudo, IconoInicio, IconoPlay, IconoReloj } from "./Icono";
+import { IconoCarpeta, IconoDocumento, IconoInicio, IconoPlay, IconoReloj } from "./Icono";
 
 const enlaces = [
   { href: "/panel", texto: "Dashboard", Icono: IconoInicio },
@@ -18,7 +19,8 @@ export default function Sidebar() {
   return (
     <aside className="barra-lateral">
       <Link href="/" className="marca">
-        <IconoEscudo /> <span>FlowGuard<small>DETECT · VERIFY · PROTECT</small></span>
+        <Image src="/logo-nombre.png" alt="FlowGuard" width={185} height={60} priority />
+        <small>DETECT · VERIFY · PROTECT</small>
       </Link>
       <nav aria-label="Principal" className="navegacion">
         {enlaces.map(({ href, texto, Icono }) => {

@@ -16,6 +16,17 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--borde) transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
@@ -23,22 +34,59 @@ body {
   background: var(--fondo);
   color: var(--texto);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow-x: hidden;
 }
 
 a {
   color: inherit;
 }
 
+/* Barra de scroll acorde al tema oscuro, en vez de la gris por defecto del
+   sistema (scrollbar-width/color arriba cubren Firefox; esto es para el
+   resto de navegadores). Aplica a toda la app porque .contenido y varias
+   tarjetas/tablas scrollean de forma independiente. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--borde);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--acento);
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+/* El body nunca scrollea: solo .contenido lo hace, así .barra-lateral
+   (altura 100%, fuera del flujo de scroll) queda fija de verdad, sin
+   depender de position: sticky ni de qué ancestro termina siendo el
+   contenedor de scroll real. En móvil (ver media query abajo) se revierte
+   a flujo normal de documento, con la barra como cabecera sticky. */
 .estructura {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* --- Sidebar --- */
 
 .barra-lateral {
-  width: 284px;
+  /* Fluido en vez de un valor fijo + un salto a los 1100px: mismo ancho
+     "relativo" en cualquier pantalla de escritorio/tablet, sin brincos. */
+  width: clamp(208px, 17vw, 260px);
   flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
   background: #091a2e;
   border-right: 1px solid var(--borde);
   padding: 1.25rem 1rem;
@@ -48,24 +96,24 @@ a {
 }
 
 .marca {
+  /* logo-nombre.png ya trae el wordmark "FlowGuard" dibujado (no se
+     reconstruye con texto aparte); el tagline va debajo, no al lado. */
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  font-size: 1.65rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
   text-decoration: none;
   padding: 0 0.5rem;
-  color: #f4f6f9;
-  min-height: 72px;
+  min-height: clamp(52px, 6vw, 64px);
 }
-.marca svg { width: 50px; height: 50px; color: #35a0ff; }
+.marca img { width: clamp(130px, 13vw, 175px); height: auto; object-fit: contain; }
 .marca small {
   display: block;
-  margin-top: 0.2rem;
   color: var(--texto-suave);
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .nota-sidebar {
@@ -93,12 +141,12 @@ a {
 .enlace {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.68rem 0.75rem;
+  gap: 0.55rem;
+  padding: 0.58rem 0.7rem;
   border-radius: 8px;
   color: var(--texto-suave);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.86rem;
 }
 .enlace:hover {
   color: var(--texto);
@@ -112,13 +160,15 @@ a {
 .contenido {
   flex: 1;
   min-width: 0;
-  padding: 1.5rem 1.75rem;
+  height: 100%;
+  overflow-y: auto;
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2.2vw, 1.65rem);
   background: radial-gradient(ellipse at 60% -35%, #112d4b 0%, var(--fondo) 63%);
 }
 
 .contenido h1 {
   margin: 0 0 0.25rem;
-  font-size: clamp(1.8rem, 2.2vw, 2.5rem);
+  font-size: clamp(1.3rem, 2vw, 1.9rem);
   letter-spacing: -0.025em;
 }
 
@@ -146,13 +196,8 @@ a {
   gap: 0.75rem;
   flex-shrink: 0;
 }
-.acciones-encabezado .boton {
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-}
+/* .boton ya trae display/align/justify/gap por defecto (ver arriba); aquí
+   solo queda lo específico de este contexto. */
 
 .encabezado-tarjeta {
   display: flex;
@@ -175,33 +220,33 @@ a {
   background: linear-gradient(145deg, rgba(13, 32, 54, 0.94), rgba(13, 29, 49, 0.96));
   border: 1px solid var(--borde);
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: clamp(0.85rem, 1.4vw, 1.1rem);
   box-shadow: 0 8px 20px rgba(1, 9, 21, 0.12);
 }
 
 .cuadricula {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.125rem;
+  gap: clamp(0.65rem, 1.2vw, 1rem);
+  margin-bottom: clamp(0.75rem, 1.4vw, 1.125rem);
 }
 
 .metrica {
   display: grid;
-  grid-template-columns: 62px minmax(0, 1fr) 76px;
+  grid-template-columns: clamp(34px, 3.6vw, 42px) minmax(0, 1fr) clamp(42px, 4.5vw, 52px);
   align-content: center;
   align-items: start;
-  gap: 1rem;
-  min-height: 138px;
-  padding: 1rem;
+  gap: clamp(0.5rem, 1vw, 0.75rem);
+  min-height: clamp(76px, 8vw, 92px);
+  padding: clamp(0.55rem, 1vw, 0.75rem);
 }
 .icono-metrica {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 62px;
-  height: 62px;
-  border-radius: 14px;
+  width: clamp(34px, 3.6vw, 42px);
+  height: clamp(34px, 3.6vw, 42px);
+  border-radius: 11px;
   color: var(--acento);
   background: var(--acento-suave);
   margin-top: 0.15rem;
@@ -213,51 +258,58 @@ a {
   gap: 0.1rem;
   min-width: 0;
 }
-.mini-grafica { width: 76px; height: 48px; align-self: start; margin-top: 0.2rem; overflow: visible; }
+.mini-grafica { width: clamp(42px, 4.5vw, 52px); height: clamp(26px, 3vw, 34px); align-self: start; margin-top: 0.2rem; overflow: visible; }
 .metrica .numero {
   color: var(--texto);
-  font-size: 2.25rem;
+  font-size: clamp(1.15rem, 1.5vw, 1.45rem);
   font-weight: 700;
   line-height: 1.1;
 }
 .metrica .etiqueta {
   color: #c5d5e8;
-  font-size: 0.98rem;
-  white-space: nowrap;
+  font-size: 0.74rem;
+  /* Antes nowrap: a varios anchos de pantalla (p. ej. ~1366px con 4
+     columnas) el texto no cabía y se salía visiblemente de la tarjeta en
+     vez de bajar de línea. */
+  overflow-wrap: break-word;
 }
 .tendencia {
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  font-size: 0.82rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
   white-space: nowrap;
 }
 
 .fila-dos-columnas {
-  /* 58% / 42%, como el mockup (gráfica / alertas) */
+  /* 58% / 42%, como el mockup (gráfica / alertas). minmax(0, Nfr), no Nfr a
+     secas: una columna con una tabla de min-width adentro (Actividad
+     reciente) si no, ignora la proporción y se queda con todo el ancho que
+     su contenido pida, sin importar qué fr se le ponga — por eso cambiar el
+     ratio antes no se notaba en nada. */
   display: grid;
-  grid-template-columns: 1.38fr 1fr;
-  gap: 1.125rem;
+  grid-template-columns: minmax(0, 1.38fr) minmax(0, 1fr);
+  gap: clamp(0.75rem, 1.4vw, 1.125rem);
   align-items: stretch;
-  margin-bottom: 1.125rem;
+  margin-bottom: clamp(0.75rem, 1.4vw, 1.125rem);
 }
-.panel-grafica, .panel-alertas { min-height: 276px; }
-.panel-recientes, .panel-reglas { min-height: 278px; }
+.panel-grafica, .panel-alertas { min-height: clamp(200px, 22vw, 260px); }
+.panel-recientes, .panel-reglas { min-height: clamp(200px, 22vw, 262px); }
 .panel-grafica .encabezado-tarjeta h2,
 .panel-alertas .encabezado-tarjeta h2,
 .panel-recientes .encabezado-tarjeta h2,
-.panel-reglas h2 { font-size: 1.08rem; }
+.panel-reglas h2 { font-size: 1rem; }
 .fila-dos-columnas-invertida {
-  /* 62% / 38% (actividad reciente / reglas con más incumplimientos) */
-  grid-template-columns: 1.63fr 1fr;
+  /* 75% / 25%. */
+  grid-template-columns: minmax(0, 2.8fr) minmax(0, 1fr);
   margin-bottom: 0;
 }
 @media (max-width: 1100px) {
   .fila-dos-columnas,
   .fila-dos-columnas-invertida {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 @media (max-width: 760px) {
@@ -267,12 +319,23 @@ a {
   }
 }
 
+/* Se intentó que el panel cupiera siempre en una sola pantalla sin scroll,
+   pero con datos reales (varias alertas, 5 reglas, tabla llena) eso obligaba
+   a comprimir cada tarjeta a una altura fija y meterle scroll interno propio
+   — se veía peor que simplemente dejar que la página scrollee, que es lo que
+   hace el resto de las vistas (solicitudes, historial, etc.). Las tarjetas
+   usan su alto natural (min-height más abajo) y .contenido scrollea si no
+   caben, igual que cualquier otra página. */
+
 /* Para que una tabla ancha nunca rompa el layout en pantallas chicas: se
    desplaza con scroll horizontal en vez de comprimir columnas ilegibles. */
 .tabla-contenedor {
   overflow-x: auto;
 }
-.tabla-contenedor table { min-width: 760px; }
+/* Antes 760px: con la columna de "Actividad reciente" en 75% del ancho de
+   la fila, ese piso forzaba scroll horizontal aun cuando ya había espacio
+   real de sobra para las 7 columnas a este tamaño de letra/padding. */
+.tabla-contenedor table { min-width: 600px; }
 
 .leyenda-grafica {
   display: flex;
@@ -320,7 +383,7 @@ a {
   min-width: 0;
 }
 .alerta-titulo { color: var(--texto); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
-.alerta-chevron { color: var(--texto-suave); font-size: 1.4rem; text-align: center; }
+.alerta-chevron { display: inline-flex; align-items: center; justify-content: center; color: var(--texto-suave); }
 .alerta-enlace:hover .alerta-chevron { color: #77b1ff; transform: translateX(2px); }
 .lista-alertas p {
   margin: 0.15rem 0 0;
@@ -344,12 +407,18 @@ a {
   white-space: nowrap;
 }
 
+.panel-reglas {
+  display: flex;
+  flex-direction: column;
+}
 .lista-reglas {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: space-between;
   gap: 0.75rem;
 }
 .lista-reglas li {
@@ -383,8 +452,13 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.regla-fila-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; color: #d9e3ef; font-size: 0.78rem; }
-.regla-fila-titulo small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texto); font-size: 0.74rem; }
+/* Antes el id ("PAG-003") y el nombre de la regla iban en la misma línea
+   compitiendo por ancho (space-between), así que el nombre casi siempre se
+   truncaba ("Separación d...") por poco espacio real. Apilados, el nombre
+   usa todo el ancho de la columna. */
+.regla-fila-titulo { display: flex; flex-direction: column; gap: 0.1rem; color: #d9e3ef; font-size: 0.7rem; }
+.regla-fila-titulo > span:first-child { color: var(--texto-suave); }
+.regla-fila-titulo small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texto); font-size: 0.78rem; font-weight: 600; }
 .barra-progreso {
   height: 8px;
   background: #1d3652;
@@ -406,12 +480,12 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
   background: var(--acento-suave);
   color: var(--acento);
-  font-size: 0.7rem;
+  font-size: 0.64rem;
   font-weight: 700;
 }
 .celda-con-avatar {
@@ -423,18 +497,18 @@ a {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
 }
 th,
 td {
   text-align: left;
-  padding: 0.62rem 0.5rem;
+  padding: 0.5rem 0.45rem;
   border-bottom: 1px solid var(--borde);
 }
 th {
   color: var(--texto-suave);
   font-weight: 600;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -442,7 +516,7 @@ tbody tr:hover {
   background: var(--superficie-alta);
 }
 .menu-acciones { position: relative; display: inline-flex; justify-content: center; }
-.accion-menu-boton { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 34px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: #9bb4d2; font: inherit; font-size: 1.2rem; letter-spacing: 0.08em; cursor: pointer; }
+.accion-menu-boton { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 30px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: #9bb4d2; cursor: pointer; }
 .accion-menu-boton:hover, .accion-menu-boton[aria-expanded="true"] { border-color: var(--borde); background: var(--superficie-alta); color: white; }
 .accion-menu-boton:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
 .menu-acciones-lista { position: absolute; z-index: 20; right: 0; bottom: calc(100% + 4px); display: grid; min-width: 170px; padding: 0.35rem; border: 1px solid var(--borde); border-radius: 9px; background: #10243a; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); }
@@ -453,10 +527,10 @@ tbody tr:hover {
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.6rem;
+  gap: 0.3rem;
+  padding: 0.18rem 0.5rem;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
 }
 .chip-permitir {
@@ -500,16 +574,33 @@ tbody tr:hover {
   padding: 0.5rem 0.6rem;
   color: var(--texto);
   font-size: 0.95rem;
+  min-height: 44px;
+  transition: border-color 0.15s;
 }
+.campo input:focus-visible,
+.campo select:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+  border-color: var(--acento);
+}
+.campo input:hover:not(:disabled),
+.campo select:hover:not(:disabled) { border-color: color-mix(in srgb, var(--borde) 40%, var(--texto-suave)); }
+.campo input:disabled,
+.campo select:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   border: none;
   border-radius: 8px;
-  padding: 0.6rem 1.1rem;
-  font-size: 0.95rem;
+  padding: clamp(0.45rem, 0.9vw, 0.6rem) clamp(0.75rem, 1.6vw, 1.1rem);
+  font-size: clamp(0.82rem, 0.95vw, 0.9rem);
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
-  min-height: 42px;
+  min-height: clamp(34px, 4vw, 40px);
 }
 .boton:hover { filter: brightness(1.08); }
 .boton-primario {
@@ -542,29 +633,434 @@ tbody tr:hover {
 }
 
 @media (max-width: 1100px) {
-  .barra-lateral { width: 248px; }
+  /* El ancho de la barra lateral, el título y los botones ya escalan solos
+     (clamp() más arriba) en vez de saltar a un valor fijo aquí; solo queda
+     la reestructuración real: la cuadrícula de métricas pasa de 4 a 2. */
   .cuadricula { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .descripcion-vista { font-size: 0.85rem; margin-bottom: 1rem; }
+  .encabezado-vista { margin-bottom: 0.9rem; }
+  .acciones-encabezado { gap: 0.5rem; }
 }
 @media (max-width: 760px) {
-  .estructura { display: block; }
-  .barra-lateral { position: static; width: 100%; min-height: 0; padding: 0.65rem 1rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem; border-right: 0; border-bottom: 1px solid var(--borde); }
-  .marca { min-height: 0; padding: 0; font-size: 1rem; }
-  .marca svg { width: 24px; height: 24px; }
+  /* En móvil se vuelve a flujo normal de documento (la página entera
+     scrollea) en vez del shell de altura fija de escritorio; la barra,
+     ahora una cabecera horizontal, se queda arriba con position: sticky. */
+  .estructura { display: block; height: auto; overflow: visible; }
+  .barra-lateral { position: sticky; top: 0; z-index: 10; width: 100%; height: auto; min-height: 0; overflow-y: visible; padding: 0.65rem 1rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem; border-right: 0; border-bottom: 1px solid var(--borde); }
+  .marca { min-height: 0; padding: 0; flex-direction: row; align-items: center; }
+  .marca img { width: 110px; height: auto; }
   .marca small, .nota-sidebar { display: none; }
   .navegacion { flex-direction: row; overflow-x: auto; gap: 0.25rem; }
   .enlace { justify-content: center; padding: 0.6rem; font-size: 0; }
   .enlace svg { flex: 0 0 18px; }
-  .contenido { padding: 1.25rem 1rem; }
+  .contenido { height: auto; overflow-y: visible; padding: 1.25rem 1rem; }
   .encabezado-vista { align-items: stretch; }
   .acciones-encabezado { flex-wrap: wrap; }
   .leyenda-grafica { gap: 0.5rem; font-size: 0.7rem; }
 }
 @media (max-width: 480px) {
   .cuadricula { grid-template-columns: 1fr; }
-  .metrica { min-height: 112px; grid-template-columns: 48px minmax(0, 1fr); }
+  /* La tercera columna (mini-gráfica) se quita del todo, no solo se
+     achica: a este ancho no cabe de forma legible. El resto del tamaño de
+     .metrica ya lo resuelve el clamp() de la regla base. */
+  .metrica { grid-template-columns: clamp(34px, 3.6vw, 42px) minmax(0, 1fr); }
   .mini-grafica { display: none; }
-  .icono-metrica { width: 48px; height: 48px; }
   .metrica .etiqueta { white-space: normal; }
-  .encabezado-vista h1 { font-size: 1.35rem; }
   .acciones-encabezado .boton { flex: 1; justify-content: center; }
+}
+
+/* --- Vista "Solicitudes de pago": barra de filtros, tabla enterprise,
+   paginación (app/solicitudes/page.tsx). Reutiliza .tarjeta/.boton/.chip/
+   table de arriba; esto es solo lo específico de esta vista. --- */
+
+.solicitudes-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.solicitudes-filtros > * { flex: 1 1 180px; min-width: 0; }
+.solicitudes-filtros .campo-busqueda { flex: 2 1 240px; }
+
+.selector,
+.campo-busqueda input,
+.rango-fechas input {
+  width: 100%;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto);
+  font-size: 0.84rem;
+  font-family: inherit;
+}
+.selector { padding: 0.55rem 0.7rem; }
+.selector:focus-visible,
+.campo-busqueda input:focus-visible,
+.rango-fechas input:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+}
+
+.campo-busqueda {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.campo-busqueda svg {
+  position: absolute;
+  left: 0.65rem;
+  color: var(--texto-suave);
+  pointer-events: none;
+}
+.campo-busqueda input { padding: 0.55rem 0.7rem 0.55rem 2.1rem; }
+
+.rango-fechas {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0 0.6rem;
+  background: var(--fondo);
+  color: var(--texto-suave);
+}
+.rango-fechas input {
+  border: none;
+  background: transparent;
+  padding: 0.5rem 0.2rem;
+  color-scheme: dark;
+}
+.rango-fechas span { color: var(--texto-suave); font-size: 0.8rem; }
+
+/* Insignia de estado: más grande que .chip (que es para contextos
+   compactos, p. ej. el panel) — aquí la decisión es el dato principal de
+   la fila. */
+.insignia-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 38px;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.insignia-permitir {
+  background: color-mix(in srgb, var(--permitir) 16%, transparent);
+  border-color: color-mix(in srgb, var(--permitir) 55%, transparent);
+  color: var(--permitir);
+}
+.insignia-bloquear {
+  background: color-mix(in srgb, var(--bloquear) 16%, transparent);
+  border-color: color-mix(in srgb, var(--bloquear) 55%, transparent);
+  color: var(--bloquear);
+}
+
+.celda-doble { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.celda-doble strong { color: var(--texto); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.celda-doble span { color: var(--texto-suave); font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.celda-id a {
+  color: var(--acento);
+  text-decoration: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 600;
+}
+.celda-id a:hover { text-decoration: underline; }
+
+.celda-importe { text-align: right; }
+.celda-importe strong { display: block; color: var(--texto); font-weight: 600; }
+.celda-importe span { display: block; color: var(--texto-suave); font-size: 0.68rem; letter-spacing: 0.03em; }
+
+.solicitudes-tabla th,
+.solicitudes-tabla td { padding: 0.85rem 0.75rem; }
+.solicitudes-tabla th:nth-child(4),
+.solicitudes-tabla td:nth-child(4) { text-align: right; }
+
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 0.75rem 0.25rem;
+  border-top: 1px solid var(--borde);
+  margin-top: 0.5rem;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+}
+.paginacion-paginas { display: flex; align-items: center; gap: 0.3rem; }
+.paginacion-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 0.5rem;
+  border: 1px solid var(--borde);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.paginacion-boton:hover:not(:disabled) { background: var(--superficie-alta); color: var(--texto); }
+.paginacion-boton:disabled { opacity: 0.4; cursor: not-allowed; }
+.paginacion-boton.activo { background: var(--acento); border-color: var(--acento); color: white; }
+.paginacion-elipsis { color: var(--texto-suave); padding: 0 0.15rem; }
+
+@media (max-width: 1100px) {
+  .solicitudes-filtros > * { flex-basis: 45%; }
+}
+@media (max-width: 760px) {
+  .solicitudes-filtros > * { flex-basis: 100%; }
+}
+
+/* --- Vista "Detalle de solicitud" (app/solicitudes/[id]/page.tsx) --- */
+
+.detalle-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--acento);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+.detalle-volver:hover { text-decoration: underline; }
+
+.detalle-titulo-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.detalle-titulo-fila h1 { margin: 0; }
+.detalle-acciones { display: flex; gap: 0.6rem; margin-left: auto; }
+
+/* Tarjeta-resumen: 4 columnas de ancho igual con separadores verticales
+   sutiles entre ellas — antes esto reutilizaba .tarjeta.metrica (pensada
+   para ícono + número + mini-gráfica en una grilla de 3 columnas), así que
+   sin esos elementos el texto caía en columnas angostas pensadas para un
+   ícono y se superponía/cortaba. Esta es una grilla propia para esta vista. */
+.resumen-solicitud {
+  display: flex;
+  margin-bottom: 1.25rem;
+}
+.resumen-columna {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 1.25rem;
+  border-left: 1px solid var(--borde);
+}
+.resumen-columna:first-child { border-left: none; padding-left: 0; }
+.resumen-columna:last-child { padding-right: 0; }
+.resumen-etiqueta {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+}
+.resumen-valor {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.resumen-valor-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: var(--acento);
+  background: var(--acento-suave);
+}
+.resumen-valor-texto { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.resumen-valor-texto strong { color: var(--texto); font-size: 0.95rem; font-weight: 600; overflow-wrap: break-word; }
+.resumen-valor-texto span { color: var(--texto-suave); font-size: 0.76rem; overflow-wrap: break-word; }
+.resumen-columna .resumen-valor-texto strong.resumen-importe { font-size: 1.3rem; }
+
+/* Banners semánticos de decisión: bloqueado / permitido / informativo
+   (resumen final). Mismo patrón que .insignia-estado (color con fondo
+   translúcido + borde), pero a ancho completo con icono + título + texto. */
+.banner-decision {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem;
+  border-radius: 10px;
+  border: 1px solid;
+  margin-bottom: 1.25rem;
+}
+.banner-decision > svg { flex-shrink: 0; margin-top: 0.1rem; }
+.banner-decision h2 { margin: 0 0 0.2rem; font-size: 0.95rem; }
+.banner-decision p { margin: 0; color: var(--texto-suave); font-size: 0.85rem; }
+.banner-bloqueado { background: color-mix(in srgb, var(--bloquear) 10%, transparent); border-color: color-mix(in srgb, var(--bloquear) 40%, transparent); }
+.banner-bloqueado h2 { color: var(--bloquear); }
+.banner-bloqueado > svg { color: var(--bloquear); }
+.banner-permitido { background: color-mix(in srgb, var(--permitir) 10%, transparent); border-color: color-mix(in srgb, var(--permitir) 40%, transparent); }
+.banner-permitido h2 { color: var(--permitir); }
+.banner-permitido > svg { color: var(--permitir); }
+.banner-info { background: var(--acento-suave); border-color: color-mix(in srgb, var(--acento) 45%, transparent); margin-top: 1.25rem; margin-bottom: 0; }
+.banner-info h2 { color: var(--acento); }
+.banner-info > svg { color: var(--acento); }
+
+/* Tabla de reglas: fila que causó el bloqueo resaltada, el resto neutro. */
+.tabla-reglas th:nth-child(1) { width: 90px; }
+.tabla-reglas th:nth-child(2) { width: 170px; }
+.tabla-reglas td { vertical-align: top; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+.tabla-reglas tr.fila-incumple { background: color-mix(in srgb, var(--bloquear) 7%, transparent); }
+.tabla-reglas tr.fila-incumple td:first-child { box-shadow: inset 3px 0 0 var(--bloquear); }
+.tabla-reglas tr.fila-indeterminada { background: color-mix(in srgb, var(--indeterminado) 7%, transparent); }
+.tabla-reglas tr.fila-indeterminada td:first-child { box-shadow: inset 3px 0 0 var(--indeterminado); }
+
+.celda-estado-regla { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 999px; }
+.celda-estado-regla.permitir { background: color-mix(in srgb, var(--permitir) 18%, transparent); color: var(--permitir); }
+.celda-estado-regla.bloquear { background: color-mix(in srgb, var(--bloquear) 18%, transparent); color: var(--bloquear); }
+.celda-estado-regla.indeterminado { background: color-mix(in srgb, var(--indeterminado) 18%, transparent); color: var(--indeterminado); }
+
+.celda-regla-nombre { font-weight: 600; color: var(--texto); }
+.celda-regla-id { display: block; color: var(--texto-suave); font-size: 0.7rem; margin-bottom: 0.1rem; }
+
+.lista-evidencia-fila { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.evidencia-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--texto);
+  text-decoration: none;
+  font-size: 0.78rem;
+}
+.evidencia-item:hover { color: var(--acento); }
+.evidencia-item svg { flex-shrink: 0; color: var(--texto-suave); }
+
+@media (max-width: 1100px) {
+  .resumen-solicitud { flex-wrap: wrap; row-gap: 1rem; }
+  .resumen-columna { flex-basis: 45%; border-left: none; padding-left: 0; }
+  .resumen-columna:nth-child(2n) { padding-left: 1.25rem; border-left: 1px solid var(--borde); }
+}
+@media (max-width: 760px) {
+  .resumen-columna,
+  .resumen-columna:nth-child(2n) { flex-basis: 100%; border-left: none; padding: 0; }
+  .detalle-acciones { margin-left: 0; width: 100%; }
+  .detalle-acciones .boton { flex: 1; }
+}
+
+/* --- Vista "Simulador de aprobación" (app/simulador/page.tsx) --- */
+
+.aviso-info { display: flex; align-items: center; gap: 0.6rem; }
+.aviso-info svg { flex-shrink: 0; color: var(--acento); }
+
+.simulador-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.simulador-formulario .formulario { grid-template-columns: 1fr 1fr; }
+.campo-ancho-completo { grid-column: 1 / -1; }
+.campo-checkbox { flex-direction: row; align-items: center; gap: 0.6rem; }
+.campo-checkbox input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--acento); flex-shrink: 0; }
+
+.simulador-subtitulo {
+  margin: 1.25rem 0 0.65rem;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.panel-resultado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 2.75rem 1.5rem;
+  color: var(--texto-suave);
+}
+.panel-resultado-vacio svg { color: var(--texto-suave); opacity: 0.55; }
+.panel-resultado-vacio h3 { margin: 0; color: var(--texto); font-size: 0.95rem; }
+.panel-resultado-vacio p { margin: 0; font-size: 0.82rem; max-width: 30ch; }
+
+.panel-error {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--bloquear) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--bloquear) 40%, transparent);
+  border-radius: 9px;
+  padding: 0.9rem 1rem;
+}
+.panel-error > svg { flex-shrink: 0; color: var(--bloquear); margin-top: 0.1rem; }
+.panel-error h3 { margin: 0 0 0.2rem; font-size: 0.88rem; color: var(--bloquear); }
+.panel-error p { margin: 0; font-size: 0.82rem; color: var(--texto-suave); }
+
+.resultado-desactualizado {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: color-mix(in srgb, var(--indeterminado) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--indeterminado) 45%, transparent);
+  color: var(--indeterminado);
+  font-size: 0.76rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 7px;
+  margin: 0 0 0.9rem;
+}
+
+.resultado-meta {
+  display: flex;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+  margin: 0.2rem 0 0.3rem;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+.resultado-meta strong { color: var(--texto); font-weight: 600; }
+
+.fila-regla-sim {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+}
+.fila-regla-sim.bloquear { background: color-mix(in srgb, var(--bloquear) 8%, transparent); }
+.fila-regla-sim.indeterminado { background: color-mix(in srgb, var(--indeterminado) 8%, transparent); }
+.fila-regla-sim-info { flex: 1; min-width: 0; }
+.fila-regla-sim-id { display: block; color: var(--texto-suave); font-size: 0.66rem; }
+.fila-regla-sim-nombre { display: block; color: var(--texto); font-size: 0.82rem; font-weight: 600; }
+
+.lista-evidencias-sim { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.evidencia-sim-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+.evidencia-sim-fila > svg { flex-shrink: 0; color: var(--texto-suave); }
+.evidencia-sim-info { flex: 1; min-width: 0; }
+.evidencia-sim-tipo { display: block; font-size: 0.8rem; color: var(--texto); font-weight: 600; }
+.evidencia-sim-desc { display: block; font-size: 0.7rem; color: var(--texto-suave); }
+
+@media (max-width: 1100px) {
+  .simulador-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .simulador-formulario .formulario { grid-template-columns: 1fr; }
 }

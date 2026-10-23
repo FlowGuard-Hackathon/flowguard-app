@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Faltan 'pago' o 'contexto' en el body" }, { status: 400 });
   }
 
-  const resultado = crearEjecucion(almacen, cuerpo.pago, cuerpo.contexto, politica);
+  const resultado = await crearEjecucion(almacen, cuerpo.pago, cuerpo.contexto, politica);
   const investigacion = await investigarEjecucion(almacen, resultado);
 
   return NextResponse.json({ resultado, investigacion });

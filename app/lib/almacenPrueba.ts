@@ -1,10 +1,11 @@
-import { FuenteDatosMemoria, type InstantaneaPolitica } from "flowguard-src";
+import { FuenteDatosMemoria, FuenteDatosPostgres, type FuenteDatosEjecuciones, type InstantaneaPolitica } from "flowguard-src";
 
-// ATENCIÓN: NO es persistencia final (contratos-api.md § 3). Es un almacén en
-// memoria del proceso de desarrollo (se pierde al reiniciar `npm run dev`),
-// compartido por las rutas de la API y por las páginas (Server Components)
-// para que todas vean las mismas ejecuciones. Sustituir por una fuente contra
-// Supabase real (flowguard-src/README.md § "Estado actual") antes de la demo.
+// ATENCIÓN: NO es persistencia final (contratos-api.md § 3), aunque con
+// DATABASE_URL definido (docker-compose.yml, servicio `db`) los datos sí
+// sobreviven a un reinicio de `npm run dev` — ver docker/init.sql para por
+// qué ese esquema no es todavía el de flowguard-supabase/migrations.
+// Compartido por las rutas de la API y por las páginas (Server Components)
+// para que todas vean las mismas ejecuciones.
 //
 // Se guarda en `globalThis` y no en una simple constante de módulo: Next.js
 // compila cada route.ts y cada page.tsx como su propio paquete, así que un
@@ -13,8 +14,12 @@ import { FuenteDatosMemoria, type InstantaneaPolitica } from "flowguard-src";
 // lista, que vive en el mismo route.ts que el POST, sí veía los datos; el
 // detalle, en otro archivo, no). `globalThis` es lo único realmente único
 // por proceso de Node, sin importar cuántos paquetes separados lo importen.
-const g = globalThis as unknown as { __flowguardAlmacen?: FuenteDatosMemoria };
-export const almacen = g.__flowguardAlmacen ?? (g.__flowguardAlmacen = new FuenteDatosMemoria());
+const g = globalThis as unknown as { __flowguardAlmacen?: FuenteDatosEjecuciones };
+export const almacen: FuenteDatosEjecuciones =
+  g.__flowguardAlmacen ??
+  (g.__flowguardAlmacen = process.env.DATABASE_URL
+    ? new FuenteDatosPostgres(process.env.DATABASE_URL)
+    : new FuenteDatosMemoria());
 
 export const politica: InstantaneaPolitica = {
   version_politica: "politica-pagos-v1",

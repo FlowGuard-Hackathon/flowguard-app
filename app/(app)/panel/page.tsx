@@ -1,10 +1,19 @@
 import Link from "next/link";
-import Avatar from "../componentes/Avatar";
-import GraficaActividad, { MiniGrafica, type PuntoActividad } from "../componentes/GraficaActividad";
-import AccionesEjecucion from "../componentes/AccionesEjecucion";
-import { IconoAlerta, IconoCheck, IconoDocumento, IconoFlechaArriba, IconoX } from "../componentes/Icono";
-import { almacen } from "../lib/almacenPrueba";
-import { NOMBRE_REGLA, claseChipDecision, formatoFecha, formatoMoneda, formatoTiempoRelativo } from "../lib/formato";
+import Avatar from "../../componentes/Avatar";
+import GraficaActividad, { MiniGrafica, type PuntoActividad } from "../../componentes/GraficaActividad";
+import AccionesEjecucion from "../../componentes/AccionesEjecucion";
+import {
+  IconoAlerta,
+  IconoChevronDerecha,
+  IconoCheck,
+  IconoDocumento,
+  IconoFlechaArriba,
+  IconoPlay,
+  IconoReloj,
+  IconoX,
+} from "../../componentes/Icono";
+import { almacen } from "../../lib/almacenPrueba";
+import { NOMBRE_REGLA, claseChipDecision, formatoFecha, formatoMoneda, formatoTiempoRelativo } from "../../lib/formato";
 
 // Sin esto, Next.js la generaría estática en `npm run build` (congelada con
 // el almacén vacío del momento del build) y no reflejaría ejecuciones nuevas
@@ -97,7 +106,7 @@ export default async function PaginaPanel() {
   const recientes = resumen.slice(0, 5);
 
   return (
-    <>
+    <div className="panel-shell">
       <div className="encabezado-vista panel-encabezado">
         <div>
           <h1>Panel de supervisión</h1>
@@ -105,11 +114,11 @@ export default async function PaginaPanel() {
         </div>
         <div className="acciones-encabezado">
           <Link href="/simulador" className="boton boton-primario">
-            <span aria-hidden="true">▶</span>
+            <IconoPlay tamano={16} />
             Simular aprobación
           </Link>
           <Link href="/solicitudes" className="boton boton-secundario">
-            <span aria-hidden="true">◷</span>
+            <IconoReloj tamano={16} />
             Ver historial
           </Link>
         </div>
@@ -182,7 +191,7 @@ export default async function PaginaPanel() {
                       </div>
                       <p>{r.ejecucion.ejecucion_id} · Importe: {formatoMoneda(r.contextoPago.monto_centavos)}</p>
                     </div>
-                    <span className="alerta-chevron" aria-hidden="true">›</span>
+                    <span className="alerta-chevron" aria-hidden="true"><IconoChevronDerecha tamano={16} /></span>
                   </Link>
                 </li>
               ))}
@@ -266,7 +275,7 @@ export default async function PaginaPanel() {
           }
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

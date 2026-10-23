@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { almacen } from "../../lib/almacenPrueba";
-import { claseChipInvestigacion } from "../../lib/formato";
+import { almacen } from "../../../lib/almacenPrueba";
+import { claseChipInvestigacion } from "../../../lib/formato";
 
 // Vista "Centro de evidencias" (detalle), requisitos-vistas.md § 6. Si no
 // existe ningún intento de investigación todavía, el informe del agente es
