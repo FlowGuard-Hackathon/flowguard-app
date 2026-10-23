@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,
   },
+  // El círculo "N" de Next.js en la esquina (indicador de modo desarrollo)
+  // no es parte del diseño del producto; se apaga para que las capturas y
+  // la demo no se confundan con algo que construimos nosotros.
+  devIndicators: false,
 };
 
 export default nextConfig;

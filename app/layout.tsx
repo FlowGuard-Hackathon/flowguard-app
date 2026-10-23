@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import type { ReactNode } from "react";
-import Navegacion from "./componentes/Navegacion";
+import Sidebar from "./componentes/Sidebar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,15 +8,15 @@ export const metadata: Metadata = {
   description: "Supervisión de aprobación de pagos simulados",
 };
 
+// metadata y children los exige Next.js con esos nombres
 export default function LayoutRaiz({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <body>
-        <header className="encabezado">
-          <a href="/" className="marca">FlowGuard</a>
-          <Navegacion />
-        </header>
-        <main className="contenido">{children}</main>
+        <div className="estructura">
+          <Sidebar />
+          <main className="contenido">{children}</main>
+        </div>
       </body>
     </html>
   );

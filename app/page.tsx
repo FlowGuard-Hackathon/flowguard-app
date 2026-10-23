@@ -4,11 +4,24 @@ export default function PaginaInicio() {
   return (
     <>
       <h1>FlowGuard</h1>
-      <p>Esqueleto inicial de la aplicación. Cada sección está pendiente de implementarse.</p>
-      <p>
-        <Link href="/probar-backend">→ Herramienta de desarrollo: probar el backend real</Link> (motor de
-        reglas + agente de Dev 3, no es parte del producto final)
+      <p className="descripcion-vista">
+        Supervisa aprobaciones de pago, detecta infracciones de reglas y explica cada decisión con evidencia
+        verificable.
       </p>
+      <div className="cuadricula">
+        <Link href="/panel" className="tarjeta">
+          Panel de supervisión
+        </Link>
+        <Link href="/solicitudes" className="tarjeta">
+          Solicitudes de pago
+        </Link>
+        <Link href="/simulador" className="tarjeta">
+          Simulador de aprobación
+        </Link>
+        <Link href="/evidencias" className="tarjeta">
+          Centro de evidencias
+        </Link>
+      </div>
     </>
   );
 }
