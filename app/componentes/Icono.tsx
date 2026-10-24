@@ -215,6 +215,15 @@ export function IconoOjoTachado({ tamano = 18 }: Props) {
   );
 }
 
+export function IconoCerebro({ tamano = 20 }: Props) {
+  return (
+    <svg width={tamano} height={tamano} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.5 2.5A2.5 2.5 0 0 1 12 5v14a2.5 2.5 0 0 1-4.9.7A2.5 2.5 0 0 1 4 17.3 2.5 2.5 0 0 1 3.3 13 2.5 2.5 0 0 1 4 8.7 2.5 2.5 0 0 1 7.1 3.2a2.5 2.5 0 0 1 2.4-.7Z" />
+      <path d="M14.5 2.5A2.5 2.5 0 0 0 12 5v14a2.5 2.5 0 0 0 4.9.7A2.5 2.5 0 0 0 20 17.3 2.5 2.5 0 0 0 20.7 13 2.5 2.5 0 0 0 20 8.7 2.5 2.5 0 0 0 16.9 3.2a2.5 2.5 0 0 0-2.4-.7Z" />
+    </svg>
+  );
+}
+
 export function IconoEdificio({ tamano = 18 }: Props) {
   return (
     <svg width={tamano} height={tamano} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

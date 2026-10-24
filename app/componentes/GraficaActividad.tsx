@@ -24,6 +24,52 @@ export function MiniGrafica({ datos, color, etiqueta }: { datos: number[]; color
   );
 }
 
+// Dona en SVG plano (stroke-dasharray/-dashoffset, sin librería) para
+// distribuciones de pocas categorías con un total significativo (p. ej.
+// monto evaluado por categoría de gasto en el panel). `color` acepta
+// cualquier valor CSS válido, incluido color-mix(), para derivar la paleta
+// del acento de marca en vez de introducir colores nuevos.
+export function GraficaDona({ segmentos, etiqueta }: { segmentos: { etiqueta: string; valor: number; color: string }[]; etiqueta: string }) {
+  const total = segmentos.reduce((acc, s) => acc + s.valor, 0);
+  if (total <= 0) return null;
+
+  const radio = 70;
+  const grosor = 26;
+  const circunferencia = 2 * Math.PI * radio;
+
+  let acumulado = 0;
+  const arcos = segmentos
+    .filter((s) => s.valor > 0)
+    .map((s) => {
+      const largo = (s.valor / total) * circunferencia;
+      const inicio = acumulado;
+      acumulado += largo;
+      return { ...s, largo, inicio };
+    });
+
+  return (
+    <svg width="160" height="160" viewBox="0 0 180 180" role="img" aria-label={etiqueta}>
+      <g transform="rotate(-90 90 90)">
+        {arcos.map((a) => (
+          <circle
+            key={a.etiqueta}
+            cx="90"
+            cy="90"
+            r={radio}
+            fill="none"
+            stroke={a.color}
+            strokeWidth={grosor}
+            strokeDasharray={`${a.largo} ${circunferencia - a.largo}`}
+            strokeDashoffset={-a.inicio}
+          >
+            <title>{`${a.etiqueta}: ${Math.round((a.valor / total) * 100)}%`}</title>
+          </circle>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
 const RADIO = 6;
 
 // Un segmento rectangular con las esquinas de ARRIBA redondeadas y las de
@@ -36,7 +82,7 @@ function segmentoConTopeRedondo(x: number, y: number, ancho: number, alto: numbe
   return `M${x},${y + r} a${r},${r} 0 0 1 ${r},${-r} h${ancho - 2 * r} a${r},${r} 0 0 1 ${r},${r} v${alto - r} h${-ancho} Z`;
 }
 
-export default function GraficaActividad({ datos }: { datos: PuntoActividad[] }) {
+export default function GraficaActividad({ datos, etiqueta = "Actividad reciente" }: { datos: PuntoActividad[]; etiqueta?: string }) {
   const altoChart = 178;
   const margenIzq = 42;
   const anchoBarra = 48;
@@ -58,7 +104,7 @@ export default function GraficaActividad({ datos }: { datos: PuntoActividad[] })
       height={altoChart + 30}
       viewBox={`0 0 ${anchoTotal} ${altoChart + 30}`}
       role="img"
-      aria-label="Actividad de los últimos 7 días"
+      aria-label={etiqueta}
     >
       {marcas.map((valor) => {
         const y = altoChart - (valor / topeEje) * altoChart;
