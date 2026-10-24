@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { almacen } from "../../lib/almacenPrueba";
-import { claseChipDecision, claseChipInvestigacion, formatoFecha } from "../../lib/formato";
+import HistorialContenido, { type FilaHistorial } from "./HistorialContenido";
 
 // Ver nota en app/panel/page.tsx: fuerza render por solicitud.
 export const dynamic = "force-dynamic";
@@ -18,10 +18,21 @@ export default async function PaginaHistorial() {
     resumen.map((r) => almacen.obtenerResultadosReglas(r.ejecucion.ejecucion_id)),
   );
 
-  const filas = resumen.map((r, i) => {
-    const reglaDeterminante =
-      r.ejecucion.decision === "BLOQUEAR" ? reglasPorEjecucion[i]?.find((x) => x.estado === "NO_CUMPLE") : undefined;
-    return { ...r, reglaDeterminante };
+  const filas: FilaHistorial[] = resumen.map((r, i) => {
+    const noCumplidas = (reglasPorEjecucion[i] ?? []).filter((x) => x.estado === "NO_CUMPLE").map((x) => x.regla_id);
+    return {
+      ejecucion_id: r.ejecucion.ejecucion_id,
+      decision: r.ejecucion.decision,
+      estado_investigacion: r.ejecucion.estado_investigacion,
+      creado_en: r.ejecucion.creado_en,
+      solicitante_id: r.contextoPago.solicitante_id,
+      // Regla determinante: solo tiene sentido si la ejecución fue bloqueada
+      // por incumplimiento de regla (decisión de negocio) — una investigación
+      // FALLIDA (error técnico del agente) no cambia esto, son conceptos
+      // separados (ver estado_investigacion, columna propia en la tabla).
+      reglaDeterminante: r.ejecucion.decision === "BLOQUEAR" ? noCumplidas[0] ?? null : null,
+      reglasNoCumplidas: noCumplidas,
+    };
   });
 
   return (
@@ -32,50 +43,15 @@ export default async function PaginaHistorial() {
         investigación del agente.
       </p>
 
-      <div className="tarjeta">
-        {filas.length === 0 ? (
+      {filas.length === 0 ? (
+        <div className="tarjeta">
           <p className="estado-vacio">
             Todavía no hay ejecuciones. Crea una desde el <Link href="/simulador">simulador</Link>.
           </p>
-        ) : (
-          <div className="tabla-contenedor">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ejecución</th>
-                  <th>Solicitante</th>
-                  <th>Decisión</th>
-                  <th>Regla determinante</th>
-                  <th>Investigación</th>
-                  <th>Fecha</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filas.map(({ ejecucion, contextoPago, reglaDeterminante }) => (
-                  <tr key={ejecucion.ejecucion_id}>
-                    <td>{ejecucion.ejecucion_id}</td>
-                    <td>{contextoPago.solicitante_id}</td>
-                    <td>
-                      <span className={claseChipDecision(ejecucion.decision)}>{ejecucion.decision}</span>
-                    </td>
-                    <td>{reglaDeterminante ? reglaDeterminante.regla_id : "—"}</td>
-                    <td>
-                      <span className={claseChipInvestigacion(ejecucion.estado_investigacion)}>
-                        {ejecucion.estado_investigacion}
-                      </span>
-                    </td>
-                    <td>{formatoFecha(ejecucion.creado_en)}</td>
-                    <td>
-                      <Link href={`/solicitudes/${ejecucion.ejecucion_id}`}>Ver detalle</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <HistorialContenido filas={filas} />
+      )}
     </>
   );
 }

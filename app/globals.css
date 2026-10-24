@@ -24,6 +24,15 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Scroll suave para los anclajes en página (navbar/footer de la landing en
+   "/" — ver app/landing/Navbar.tsx). Solo con el usuario sin pedir
+   movimiento reducido. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 html,
 body {
   height: 100%;
@@ -1063,4 +1072,132 @@ tbody tr:hover {
 }
 @media (max-width: 640px) {
   .simulador-formulario .formulario { grid-template-columns: 1fr; }
+}
+
+/* --- Vista "Centro de evidencias" (app/(app)/evidencias/page.tsx +
+   CentroEvidencias.tsx): tabla + panel de detalle en 67/33. Reutiliza
+   .solicitudes-filtros/.selector/.campo-busqueda/.paginacion/.tarjeta/.chip/
+   table de arriba; esto es solo lo específico de esta vista. --- */
+
+.evidencias-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(0.85rem, 1.4vw, 1.25rem);
+  align-items: start;
+}
+.evidencias-tabla-tarjeta,
+.panel-detalle-evidencia { min-width: 0; }
+
+.evidencias-tabla th:nth-child(1) { width: 130px; }
+.evidencias-tabla th:nth-child(7) { width: 110px; }
+.evidencias-tabla th:last-child { width: 40px; }
+.evidencias-tabla td:last-child { text-align: center; }
+
+tbody tr.fila-seleccionada { background: var(--acento-suave); }
+tbody tr.fila-seleccionada td:first-child { box-shadow: inset 3px 0 0 var(--acento); }
+
+.vista-previa-evidencia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 92px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  background: var(--superficie-alta);
+  color: var(--acento);
+}
+
+.evidencia-detalle-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.2rem;
+}
+.evidencia-detalle-cabecera h2 { margin: 0; font-size: 1rem; }
+.evidencia-detalle-ref {
+  display: block;
+  color: var(--texto-suave);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  margin-bottom: 1rem;
+}
+
+.evidencia-detalle-subtitulo {
+  margin: 1.1rem 0 0.5rem;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.lista-metadatos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+}
+.lista-metadatos > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--borde);
+}
+.lista-metadatos > div:last-child { border-bottom: none; padding-bottom: 0; }
+.lista-metadatos dt {
+  color: var(--texto-suave);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.lista-metadatos dd {
+  margin: 0;
+  color: var(--texto);
+  font-size: 0.86rem;
+  overflow-wrap: break-word;
+}
+.lista-metadatos dd a { color: var(--acento); text-decoration: none; }
+.lista-metadatos dd a:hover { text-decoration: underline; }
+
+@media (max-width: 1100px) {
+  .evidencias-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 1920px) {
+  .evidencias-grid { gap: 1.5rem; }
+}
+
+/* --- Panel: distribución por categoría (app/(app)/panel/page.tsx) --- */
+
+.panel-categorias-tarjeta { margin-top: clamp(0.75rem, 1.4vw, 1.125rem); }
+.panel-categorias {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.leyenda-dona {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+  min-width: 200px;
+}
+.leyenda-dona-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--texto);
+}
+.leyenda-dona-fila .punto {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  margin-right: 0.35rem;
 }

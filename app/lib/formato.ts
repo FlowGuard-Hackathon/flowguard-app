@@ -2,6 +2,69 @@ export function formatoMoneda(centavos: number): string {
   return (centavos / 100).toLocaleString("es-MX", { style: "currency", currency: "MXN" });
 }
 
+// "YYYY-MM-DD" (lo que da un <input type="date">) a medianoche LOCAL, no UTC
+// — new Date("YYYY-MM-DD") lo interpreta como UTC y en México (UTC-6) cae un
+// día antes al convertir a local, corriendo los cálculos de rango un día.
+export function fechaLocalDesdeIso(iso: string): Date {
+  const partes = iso.split("-").map(Number);
+  const anio = partes[0] ?? 1970;
+  const mes = partes[1] ?? 1;
+  const dia = partes[2] ?? 1;
+  return new Date(anio, mes - 1, dia);
+}
+
+type PuntoActividadResumen = {
+  creado_en: string;
+  decision: "PERMITIR" | "BLOQUEAR";
+  estado_investigacion: string;
+};
+
+// Agrupa ejecuciones reales en como máximo `maxBuckets` columnas dentro de
+// [desde, hasta] — por día si el rango cabe entero, si no por bloques de
+// varios días repartidos parejo. Sin este límite, un rango largo (30/90
+// días) generaría más barras de las que GraficaActividad.tsx puede dibujar
+// legible (su geometría interna está pensada para ~7-12 barras).
+export function construirPuntosActividad<T extends PuntoActividadResumen>(
+  ejecuciones: T[],
+  desde: Date,
+  hasta: Date,
+  maxBuckets = 12,
+) {
+  const inicioRango = new Date(desde);
+  inicioRango.setHours(0, 0, 0, 0);
+  const finRango = new Date(hasta);
+  finRango.setHours(0, 0, 0, 0);
+
+  const totalDias = Math.max(1, Math.round((finRango.getTime() - inicioRango.getTime()) / 86_400_000) + 1);
+  const diasPorBloque = Math.max(1, Math.ceil(totalDias / maxBuckets));
+  const numBloques = Math.ceil(totalDias / diasPorBloque);
+  const fmt = (d: Date) => d.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+
+  return Array.from({ length: numBloques }, (_, i) => {
+    const inicioBloque = new Date(inicioRango);
+    inicioBloque.setDate(inicioRango.getDate() + i * diasPorBloque);
+    const finBloque = new Date(inicioBloque);
+    finBloque.setDate(inicioBloque.getDate() + diasPorBloque - 1);
+    if (finBloque.getTime() > finRango.getTime()) finBloque.setTime(finRango.getTime());
+    const finBloqueExclusivo = new Date(finBloque);
+    finBloqueExclusivo.setDate(finBloque.getDate() + 1);
+
+    const delBloque = ejecuciones.filter((e) => {
+      const t = new Date(e.creado_en).getTime();
+      return t >= inicioBloque.getTime() && t < finBloqueExclusivo.getTime();
+    });
+
+    const soloUnDia = diasPorBloque === 1;
+    return {
+      etiqueta: soloUnDia ? fmt(inicioBloque) : `${inicioBloque.getDate()}–${fmt(finBloque)}`,
+      fechaCompleta: soloUnDia ? fmt(inicioBloque) : `${fmt(inicioBloque)} – ${fmt(finBloque)}`,
+      permitidas: delBloque.filter((e) => e.decision === "PERMITIR").length,
+      bloqueadas: delBloque.filter((e) => e.decision === "BLOQUEAR").length,
+      pendientes: delBloque.filter((e) => ["PENDIENTE", "EN_CURSO"].includes(e.estado_investigacion)).length,
+    };
+  });
+}
+
 export function formatoFecha(iso: string): string {
   return new Date(iso).toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" });
 }
@@ -102,6 +165,15 @@ export const ETIQUETA_TIPO_EVIDENCIA: Record<string, string> = {
   REGISTRO_CATEGORIA: "Registro de categoría",
   REGISTRO_FACTURA: "Verificación de factura",
   SALDO_PRESUPUESTO: "Saldo de presupuesto",
+};
+
+// Estado de verificación de una evidencia = el estado de la regla que la citó
+// (servidor/ejecuciones/crearEjecucion.ts: cada evidencia nace ligada a una
+// sola regla). No es un campo propio de RegistroEvidencia, se deriva.
+export const ETIQUETA_ESTADO_EVIDENCIA: Record<"CUMPLE" | "NO_CUMPLE" | "INDETERMINADO", string> = {
+  CUMPLE: "Verificado",
+  NO_CUMPLE: "No disponible",
+  INDETERMINADO: "Pendiente",
 };
 
 // Resumen final de la decisión (banner de cierre), derivado de las reglas
