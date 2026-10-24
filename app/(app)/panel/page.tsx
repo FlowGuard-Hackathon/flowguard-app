@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Avatar from "../../componentes/Avatar";
-import GraficaActividad, { MiniGrafica, type PuntoActividad } from "../../componentes/GraficaActividad";
+import GraficaActividad, { GraficaDona, MiniGrafica } from "../../componentes/GraficaActividad";
 import AccionesEjecucion from "../../componentes/AccionesEjecucion";
 import {
   IconoAlerta,
@@ -13,7 +13,27 @@ import {
   IconoX,
 } from "../../componentes/Icono";
 import { almacen } from "../../lib/almacenPrueba";
-import { NOMBRE_REGLA, claseChipDecision, formatoFecha, formatoMoneda, formatoTiempoRelativo } from "../../lib/formato";
+import {
+  NOMBRE_REGLA,
+  claseChipDecision,
+  construirPuntosActividad,
+  formatoFecha,
+  formatoMoneda,
+  formatoTiempoRelativo,
+} from "../../lib/formato";
+
+const RANGOS = [
+  { valor: "7", dias: 7, etiqueta: "7 días" },
+  { valor: "30", dias: 30, etiqueta: "30 días" },
+  { valor: "90", dias: 90, etiqueta: "90 días" },
+] as const;
+
+// Paleta derivada del acento de marca (sin introducir colores nuevos): una
+// secuencia de azules de más a menos saturados, una por categoría.
+function colorCategoria(indice: number): string {
+  const porcentaje = Math.max(20, 90 - indice * 18);
+  return `color-mix(in srgb, var(--acento) ${porcentaje}%, white)`;
+}
 
 // Sin esto, Next.js la generaría estática en `npm run build` (congelada con
 // el almacén vacío del momento del build) y no reflejaría ejecuciones nuevas
@@ -44,7 +64,10 @@ function porcentajeDelTotal(parte: number, total: number): string | null {
 // de ejecuciones reales; nada se simula: lo que no puede calcularse con lo
 // que hay (p. ej. "Historial" o "Configuración" del mockup, que no tienen
 // vista propia) se omite en vez de mostrarse vacío.
-export default async function PaginaPanel() {
+export default async function PaginaPanel({ searchParams }: { searchParams: Promise<{ rango?: string }> }) {
+  const { rango: rangoParam } = await searchParams;
+  const rangoSeleccionado = RANGOS.find((r) => r.valor === rangoParam) ?? RANGOS[0];
+
   const resumen = await almacen.listarResumenEjecuciones();
   const reglasPorEjecucion = await Promise.all(
     resumen.map((r) => almacen.obtenerResultadosReglas(r.ejecucion.ejecucion_id)),
@@ -64,23 +87,41 @@ export default async function PaginaPanel() {
     ["PENDIENTE", "EN_CURSO"].includes(r.ejecucion.estado_investigacion),
   ).length;
 
+  // Tendencia semana-contra-semana: siempre compara 7 días reales contra los
+  // 7 anteriores, sin importar qué rango esté seleccionado en la gráfica —
+  // su significado ("vs. semana anterior") no cambia con el selector.
   const tendenciaTotal = tendencia(estaSemana.length, semanaAnterior.length);
 
-  // Actividad de los últimos 7 días (datos reales, agrupados por fecha de creación).
+  // Ventana de la gráfica y de la distribución por categoría: las dos leen
+  // del mismo `enRango`, así quedan sincronizadas entre sí y con el selector.
   const hoy = new Date();
-  const grafica: PuntoActividad[] = Array.from({ length: 7 }).map((_, i) => {
-    const dia = new Date(hoy);
-    dia.setDate(hoy.getDate() - (6 - i));
-    const clave = dia.toDateString();
-    const delDia = resumen.filter((r) => new Date(r.ejecucion.creado_en).toDateString() === clave);
-    return {
-      etiqueta: dia.toLocaleDateString("es-MX", { day: "numeric", month: "short" }),
-      fechaCompleta: dia.toLocaleDateString("es-MX", { day: "numeric", month: "short" }),
-      permitidas: delDia.filter((r) => r.ejecucion.decision === "PERMITIR").length,
-      bloqueadas: delDia.filter((r) => r.ejecucion.decision === "BLOQUEAR").length,
-      pendientes: delDia.filter((r) => ["PENDIENTE", "EN_CURSO"].includes(r.ejecucion.estado_investigacion)).length,
-    };
-  });
+  const desdeRango = new Date(hoy);
+  desdeRango.setDate(hoy.getDate() - (rangoSeleccionado.dias - 1));
+  const enRango = resumen.filter((r) => new Date(r.ejecucion.creado_en).getTime() >= desdeRango.getTime());
+  const grafica = construirPuntosActividad(
+    enRango.map((r) => ({
+      creado_en: r.ejecucion.creado_en,
+      decision: r.ejecucion.decision,
+      estado_investigacion: r.ejecucion.estado_investigacion,
+    })),
+    desdeRango,
+    hoy,
+  );
+
+  // Investigaciones fallidas (error técnico del agente) dentro del rango —
+  // concepto separado de BLOQUEAR (decisión de negocio del motor): una
+  // FALLIDA no implica que el motor haya bloqueado el pago, ni viceversa.
+  const fallidasEnRango = enRango.filter((r) => r.ejecucion.estado_investigacion === "FALLIDA").length;
+
+  // Monto evaluado por categoría de gasto, dentro del mismo rango.
+  const montoPorCategoria = new Map<string, number>();
+  for (const r of enRango) {
+    montoPorCategoria.set(r.contextoPago.categoria, (montoPorCategoria.get(r.contextoPago.categoria) ?? 0) + r.contextoPago.monto_centavos);
+  }
+  const categorias = [...montoPorCategoria.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([categoria, monto], i) => ({ categoria, monto, color: colorCategoria(i) }));
+  const totalCategorias = categorias.reduce((acc, c) => acc + c.monto, 0);
 
   // Alertas reales: las ejecuciones bloqueadas más recientes, con la primera
   // regla que no se cumplió y su mensaje (no se inventa ningún texto: es el
@@ -158,17 +199,41 @@ export default async function PaginaPanel() {
       <div className="fila-dos-columnas">
         <div className="tarjeta panel-grafica">
           <div className="encabezado-tarjeta">
-            <h2 style={{ margin: 0 }}>Actividad de las solicitudes (últimos 7 días)</h2>
-            <div className="leyenda-grafica">
-              <span>
-                <i className="punto" style={{ background: "var(--permitir)" }} /> PERMITIR
-              </span>
-              <span>
-                <i className="punto" style={{ background: "var(--bloquear)" }} /> BLOQUEAR
-              </span>
+            <h2 style={{ margin: 0 }}>Actividad de las solicitudes (últimos {rangoSeleccionado.dias} días)</h2>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.9rem", flexWrap: "wrap" }}>
+              <div className="leyenda-grafica">
+                <span>
+                  <i className="punto" style={{ background: "var(--permitir)" }} /> PERMITIR
+                </span>
+                <span>
+                  <i className="punto" style={{ background: "var(--bloquear)" }} /> BLOQUEAR
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "0.4rem" }}>
+                {RANGOS.map((r) => (
+                  <Link
+                    key={r.valor}
+                    href={`/panel?rango=${r.valor}`}
+                    className={`boton ${r.valor === rangoSeleccionado.valor ? "boton-primario" : "boton-secundario"}`}
+                    style={{ padding: "0.3rem 0.65rem", fontSize: "0.75rem", minHeight: "auto" }}
+                  >
+                    {r.etiqueta}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
-          {estaSemana.length === 0 ? <p className="estado-vacio">Sin evaluaciones en los últimos siete días. Se mostrarán aquí cuando haya actividad.</p> : <GraficaActividad datos={grafica} />}
+          {fallidasEnRango > 0 && (
+            <p className="resultado-desactualizado">
+              <IconoAlerta tamano={14} />
+              {fallidasEnRango} investigación(es) de IA fallida(s) por error técnico en este rango — no son pagos bloqueados por el motor.
+            </p>
+          )}
+          {enRango.length === 0 ? (
+            <p className="estado-vacio">Sin evaluaciones en los últimos {rangoSeleccionado.dias} días. Se mostrarán aquí cuando haya actividad.</p>
+          ) : (
+            <GraficaActividad datos={grafica} etiqueta={`Actividad de los últimos ${rangoSeleccionado.dias} días`} />
+          )}
         </div>
 
         <div className="tarjeta panel-alertas">
@@ -274,6 +339,29 @@ export default async function PaginaPanel() {
             </ul>
           }
         </div>
+      </div>
+
+      <div className="tarjeta panel-categorias-tarjeta">
+        <h2 style={{ marginTop: 0 }}>Monto evaluado por categoría ({rangoSeleccionado.etiqueta})</h2>
+        {categorias.length === 0 ? (
+          <p className="estado-vacio">Sin evaluaciones en este rango.</p>
+        ) : (
+          <div className="panel-categorias">
+            <GraficaDona segmentos={categorias.map((c) => ({ etiqueta: c.categoria, valor: c.monto, color: c.color }))} etiqueta="Monto evaluado por categoría" />
+            <ul className="leyenda-dona">
+              {categorias.map((c) => (
+                <li key={c.categoria} className="leyenda-dona-fila">
+                  <span>
+                    <i className="punto" style={{ background: c.color }} /> {c.categoria}
+                  </span>
+                  <span>
+                    {formatoMoneda(c.monto)} · {totalCategorias ? Math.round((c.monto / totalCategorias) * 100) : 0}%
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
