@@ -116,45 +116,124 @@ svg {
   white-space: nowrap;
 }
 
-.nota-sidebar {
+.tarjeta-sesion {
   margin-top: auto;
-  padding: 0 0.5rem;
-  color: var(--texto-suave);
-  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
 }
-.nota-sidebar small { color: var(--texto-suave); }
+.tarjeta-sesion-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.avatar-sesion {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--acento), #1a3f8f);
+}
+.nota-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+.correo-sesion {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--texto);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.nota-sidebar small {
+  display: inline-flex;
+  align-items: center;
+  color: var(--texto-suave);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
 .estado-demo {
   display: inline-block;
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   margin-right: 0.35rem;
   border-radius: 50%;
   background: var(--permitir);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--permitir) 25%, transparent);
+}
+.boton-cerrar-sesion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: var(--superficie-alta);
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.boton-cerrar-sesion:hover {
+  border-color: var(--bloquear);
+  color: var(--bloquear);
+  background: color-mix(in srgb, var(--bloquear) 10%, var(--superficie-alta));
 }
 
 .navegacion {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
+}
+.navegacion-etiqueta {
+  padding: 0 0.7rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  opacity: 0.7;
 }
 
 .enlace {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.6rem;
   padding: 0.58rem 0.7rem;
   border-radius: 8px;
   color: var(--texto-suave);
   text-decoration: none;
   font-size: 0.86rem;
+  transition: color 0.18s ease, background 0.18s ease;
 }
 .enlace:hover {
   color: var(--texto);
   background: var(--superficie-alta);
 }
 .enlace.activo {
-  color: var(--texto);
+  color: #fff;
   background: linear-gradient(105deg, #1167dc, #0d4d9f);
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--acento) 55%, transparent);
 }
 
 .contenido {
@@ -522,6 +601,24 @@ tbody tr:hover {
 .menu-acciones-lista { position: absolute; z-index: 20; right: 0; bottom: calc(100% + 4px); display: grid; min-width: 170px; padding: 0.35rem; border: 1px solid var(--borde); border-radius: 9px; background: #10243a; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); }
 .menu-acciones-lista a { padding: 0.65rem 0.75rem; border-radius: 6px; color: var(--texto); text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
 .menu-acciones-lista a:hover, .menu-acciones-lista a:focus-visible { background: var(--superficie-alta); outline: none; }
+.menu-acciones-lista button {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--texto);
+  text-decoration: none;
+  font-size: 0.85rem;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.menu-acciones-lista button:hover:not(:disabled), .menu-acciones-lista button:focus-visible { background: var(--superficie-alta); outline: none; }
+.menu-acciones-lista button:disabled { color: var(--texto-suave); cursor: wait; }
+.menu-acciones-divisor { height: 1px; margin: 0.3rem 0.25rem; background: var(--borde); }
+.menu-acciones-error { margin: 0.3rem 0.25rem 0.1rem; padding: 0.5rem 0.6rem; border-radius: 6px; background: color-mix(in srgb, var(--bloquear) 14%, transparent); color: var(--bloquear); font-size: 0.78rem; line-height: 1.4; max-width: 220px; white-space: normal; }
 .chip svg { flex: 0 0 auto; }
 
 .chip {
@@ -649,10 +746,15 @@ tbody tr:hover {
   .barra-lateral { position: sticky; top: 0; z-index: 10; width: 100%; height: auto; min-height: 0; overflow-y: visible; padding: 0.65rem 1rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem; border-right: 0; border-bottom: 1px solid var(--borde); }
   .marca { min-height: 0; padding: 0; flex-direction: row; align-items: center; }
   .marca img { width: 110px; height: auto; }
-  .marca small, .nota-sidebar { display: none; }
+  .marca small { display: none; }
   .navegacion { flex-direction: row; overflow-x: auto; gap: 0.25rem; }
+  .navegacion-etiqueta { display: none; }
   .enlace { justify-content: center; padding: 0.6rem; font-size: 0; }
   .enlace svg { flex: 0 0 18px; }
+  .tarjeta-sesion { margin: 0 0 0 auto; flex-direction: row; flex-shrink: 0; padding: 0; border: 0; background: none; }
+  .tarjeta-sesion-usuario { display: none; }
+  .boton-cerrar-sesion { width: auto; padding: 0.6rem; }
+  .texto-cerrar-sesion { display: none; }
   .contenido { height: auto; overflow-y: visible; padding: 1.25rem 1rem; }
   .encabezado-vista { align-items: stretch; }
   .acciones-encabezado { flex-wrap: wrap; }
@@ -1063,4 +1165,80 @@ tbody tr:hover {
 }
 @media (max-width: 640px) {
   .simulador-formulario .formulario { grid-template-columns: 1fr; }
+}
+
+/* --- Vista "Centro de evidencias" (app/evidencias/page.tsx y [id]/page.tsx) --- */
+
+.boton-compacto {
+  min-height: 30px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.76rem;
+}
+
+/* Registros de evidencia: una tarjeta por registro (icono + tipo + origen +
+   pares etiqueta/valor de `contenido`), en vez de una tabla con JSON crudo
+   — mismo espíritu que .evidencia-sim-fila del simulador, pero con el
+   contenido completo visible en vez de solo un chip de estado. */
+.cuadricula-evidencias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+.tarjeta-evidencia {
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 0.9rem;
+  background: var(--superficie);
+}
+.tarjeta-evidencia-encabezado {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+.tarjeta-evidencia-encabezado strong { display: block; color: var(--texto); font-size: 0.85rem; }
+.tarjeta-evidencia-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--acento);
+  background: var(--acento-suave);
+}
+.tarjeta-evidencia-ref { display: block; color: var(--texto-suave); font-size: 0.68rem; margin-top: 0.1rem; }
+.tarjeta-evidencia-contenido {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--borde);
+}
+.tarjeta-evidencia-contenido > div { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.76rem; }
+.tarjeta-evidencia-contenido dt { color: var(--texto-suave); }
+.tarjeta-evidencia-contenido dd { margin: 0; color: var(--texto); font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+
+/* Hallazgos del informe del agente: una tarjeta por hallazgo, con la regla
+   y el identificador como chips (reutiliza .chip, no un estilo nuevo), la
+   afirmación como texto y las referencias de evidencia citadas al pie. */
+.lista-hallazgos { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.1rem; }
+.tarjeta-hallazgo {
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  padding: 0.75rem 0.85rem;
+}
+.tarjeta-hallazgo-encabezado { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+.tarjeta-hallazgo p { margin: 0; color: var(--texto); font-size: 0.85rem; }
+.tarjeta-hallazgo-refs { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+
+.lista-acciones-recomendadas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.25rem; }
+
+.lista-limitaciones { margin: 0.4rem 0 0; padding-left: 1.1rem; color: var(--texto-suave); font-size: 0.85rem; }
+.lista-limitaciones li { margin-bottom: 0.3rem; }
+.lista-limitaciones li:last-child { margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .cuadricula-evidencias { grid-template-columns: 1fr; }
 }

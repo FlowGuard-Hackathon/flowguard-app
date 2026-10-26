@@ -109,6 +109,11 @@ export default function PaginaSimulador() {
         presupuesto_disponible_centavos:
           form.presupuestoDisponibleMxn === "" ? null : Math.round(Number(form.presupuestoDisponibleMxn) * 100),
       },
+      // contratos-api.md § 2.2: obligatoria en modo real (ver app/api/v1/
+      // ejecuciones/route.ts). Una por envío del formulario (no por
+      // render): dos clics accidentales sobre el mismo resultado deben
+      // tratarse como la misma solicitud, no como dos ejecuciones distintas.
+      clave_idempotencia: crypto.randomUUID(),
     };
 
     try {

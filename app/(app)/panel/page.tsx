@@ -245,7 +245,7 @@ export default async function PaginaPanel() {
                       </td>
                       <td>{formatoFecha(ejecucion.creado_en)}</td>
                       <td>
-                        <AccionesEjecucion id={ejecucion.ejecucion_id} />
+                        <AccionesEjecucion id={ejecucion.ejecucion_id} estadoInvestigacion={ejecucion.estado_investigacion} />
                       </td>
                     </tr>
                   ))}

@@ -14,6 +14,7 @@ type Decision = "PERMITIR" | "BLOQUEAR";
 type Ejecucion = {
   ejecucion_id: string;
   decision: Decision;
+  estado_investigacion?: string;
   creado_en: string;
   pago: {
     pago_id: string;
@@ -271,7 +272,7 @@ function ContenidoSolicitudes() {
                         </div>
                       </td>
                       <td>
-                        <AccionesEjecucion id={e.ejecucion_id} />
+                        <AccionesEjecucion id={e.ejecucion_id} estadoInvestigacion={e.estado_investigacion} />
                       </td>
                     </tr>
                   ))}
